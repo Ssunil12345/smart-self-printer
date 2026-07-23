@@ -16,8 +16,8 @@ Self-service print ordering application built with Flutter. Users can upload doc
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `30-update.php` | POST | Upload file with print options |
-| `31-update.php` | GET | Confirm payment (`?value=1` success, `?value=0` failure) |
+| `update.php` | POST | Upload file with print options |
+| `update.php` | GET | Confirm payment (`?value=1` success, `?value=0` failure) |
 
 ### POST Parameters (30-update.php)
 

@@ -187,6 +187,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                   ),
                 ),
+                const SizedBox(height: 12),
+                FadeIn(
+                  delay: const Duration(milliseconds: 450),
+                  child: AppButton(
+                    text: AppStrings.cancelPayment,
+                    isOutlined: true,
+                    onPressed: paymentProvider.isProcessing
+                        ? null
+                        : () => _cancelPayment(
+                              context,
+                              paymentProvider,
+                              orderNumber,
+                            ),
+                  ),
+                ),
                 if (paymentProvider.isConfirming) ...[
                   const SizedBox(height: 16),
                   Center(
@@ -295,5 +310,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
       );
     }
+  }
+
+  Future<void> _cancelPayment(
+    BuildContext context,
+    PaymentProvider paymentProvider,
+    String orderNumber,
+  ) async {
+    await paymentProvider.confirmPayment('0');
+    if (!mounted) return;
+
+    ErrorDialog.show(
+      context: context,
+      title: 'Payment Failed',
+      message: 'Payment was cancelled by the user',
+      retryLabel: 'Retry',
+      onRetry: () => _cancelPayment(
+        context,
+        paymentProvider,
+        orderNumber,
+      ),
+    );
   }
 }

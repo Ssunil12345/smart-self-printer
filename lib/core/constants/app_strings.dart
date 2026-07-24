@@ -95,6 +95,7 @@ class AppStrings {
   static const String invalidFile = 'Invalid file format';
   static const String uploadFailed = 'Upload failed';
   static const String paymentFailed = 'Payment failed';
+  static const String cancelPayment = 'Cancel Payment';
   static const String somethingWentWrong = 'Something went wrong';
   static const String pageRangeHint = 'e.g. 1-5,8,10';
   static const String enterCustomPages = 'Enter custom pages';

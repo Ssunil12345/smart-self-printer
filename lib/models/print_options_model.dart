@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../core/utils/helpers.dart';
 
 class PrintOptionsModel extends Equatable {
   final bool isColor;
@@ -6,6 +7,7 @@ class PrintOptionsModel extends Equatable {
   final String? pageRange;
   final int copies;
   final int totalPages;
+  final int totalFilePages;
   final double totalPrice;
   final String fileName;
   final String filePath;
@@ -18,6 +20,7 @@ class PrintOptionsModel extends Equatable {
     this.pageRange,
     required this.copies,
     required this.totalPages,
+    required this.totalFilePages,
     required this.totalPrice,
     required this.fileName,
     required this.filePath,
@@ -31,6 +34,7 @@ class PrintOptionsModel extends Equatable {
     String? pageRange,
     int? copies,
     int? totalPages,
+    int? totalFilePages,
     double? totalPrice,
     String? fileName,
     String? filePath,
@@ -43,6 +47,7 @@ class PrintOptionsModel extends Equatable {
       pageRange: pageRange ?? this.pageRange,
       copies: copies ?? this.copies,
       totalPages: totalPages ?? this.totalPages,
+      totalFilePages: totalFilePages ?? this.totalFilePages,
       totalPrice: totalPrice ?? this.totalPrice,
       fileName: fileName ?? this.fileName,
       filePath: filePath ?? this.filePath,
@@ -51,10 +56,13 @@ class PrintOptionsModel extends Equatable {
     );
   }
 
+  int get calculatedPageCount {
+    if (pageOption == 'All') return totalFilePages;
+    return Helpers.parseCustomRange(pageRange, totalFilePages);
+  }
+
   Map<String, dynamic> toApiFields() => {
-        'pages': pageOption == 'Custom' && pageRange != null
-            ? pageRange!
-            : 'all',
+        'pages': calculatedPageCount.toString(),
         'colour': isColor ? 'Color' : 'Black & White',
         'counts': copies.toString(),
       };
@@ -66,6 +74,7 @@ class PrintOptionsModel extends Equatable {
         pageRange,
         copies,
         totalPages,
+        totalFilePages,
         totalPrice,
         fileName,
         filePath,

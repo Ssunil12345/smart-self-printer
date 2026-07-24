@@ -33,6 +33,7 @@ dependencies:
   package_info_plus: ^8.1.2
   device_info_plus: ^11.3.0
   animate_do: ^3.3.4
+  pdfx: ^2.9.2
 
 dev_dependencies:
   flutter_test:

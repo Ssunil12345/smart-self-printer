@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -20,11 +21,28 @@ class PrintOptionsScreen extends StatefulWidget {
 }
 
 class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
-  final _pageRangeController = TextEditingController();
+  final _fromController = TextEditingController();
+  final _toController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initFile();
+    });
+  }
+
+  Future<void> _initFile() async {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is PlatformFile && args.path != null) {
+      await context.read<PrintProvider>().initFile(args.path!);
+    }
+  }
 
   @override
   void dispose() {
-    _pageRangeController.dispose();
+    _fromController.dispose();
+    _toController.dispose();
     super.dispose();
   }
 
@@ -56,6 +74,53 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
                 FadeIn(
                   child: GlassCard(
                     child: Column(
+                      children: [
+                        _buildSectionTitle('File Info'),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Icon(Icons.picture_as_pdf,
+                                color: AppColors.primary, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              file?.name ?? 'Unknown',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                        if (printProvider.totalFilePages > 0) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.description,
+                                  color: AppColors.textSecondary, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Total Pages: ${printProvider.totalFilePages}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                FadeIn(
+                  child: GlassCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildSectionTitle('Color Mode'),
                         const SizedBox(height: 12),
@@ -126,18 +191,34 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
                         ),
                         if (printProvider.pageOption == 'Custom') ...[
                           const SizedBox(height: 16),
-                          TextField(
-                            controller: _pageRangeController,
-                            decoration: InputDecoration(
-                              hintText: 'e.g. 1-5,8,10',
-                              labelText: 'Page Range',
-                              prefixIcon: const Icon(Icons.numbers, size: 20),
-                              helperText:
-                                  'Enter page numbers or ranges separated by commas',
-                              helperMaxLines: 2,
-                            ),
-                            keyboardType: TextInputType.text,
-                            onChanged: (v) => printProvider.setPageRange(v),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _fromController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'From',
+                                    prefixIcon: Icon(Icons.first_page,
+                                        size: 20),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (v) => _updatePageRange(),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextField(
+                                  controller: _toController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'To',
+                                    prefixIcon:
+                                        Icon(Icons.last_page, size: 20),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (v) => _updatePageRange(),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ],
@@ -247,15 +328,26 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
     );
   }
 
+  void _updatePageRange() {
+    final from = _fromController.text.trim();
+    final to = _toController.text.trim();
+    if (from.isNotEmpty && to.isNotEmpty) {
+      context.read<PrintProvider>().setPageRange('$from-$to');
+    } else {
+      context.read<PrintProvider>().setPageRange(null);
+    }
+  }
+
   void _handleContinue(BuildContext context, PlatformFile file) async {
     final printProvider = context.read<PrintProvider>();
 
     if (printProvider.pageOption == 'Custom') {
-      final range = _pageRangeController.text.trim();
-      if (range.isEmpty) {
+      final from = int.tryParse(_fromController.text.trim());
+      final to = int.tryParse(_toController.text.trim());
+      if (from == null || to == null || from < 1 || to > printProvider.totalFilePages || from > to) {
         ErrorDialog.showSnackBar(
           context: context,
-          message: 'Please enter page range',
+          message: 'Please enter a valid page range (1-${printProvider.totalFilePages})',
         );
         return;
       }

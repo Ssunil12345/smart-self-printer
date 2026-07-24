@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:pdfx/pdfx.dart';
 import '../constants/app_constants.dart';
 
 class Helpers {
@@ -52,6 +53,42 @@ class Helpers {
     }
   }
 
+  static Future<int> getPdfPageCount(String filePath) async {
+    try {
+      final doc = await PdfDocument.openFile(filePath);
+      final count = doc.pagesCount;
+      await doc.close();
+      return count;
+    } catch (_) {
+      return 1;
+    }
+  }
+
+  static int parseCustomRange(String? pageRange, int totalFilePages) {
+    if (pageRange == null || pageRange.isEmpty) return 0;
+    final pages = <int>{};
+    final parts = pageRange.split(',');
+    for (final part in parts) {
+      final trimmed = part.trim();
+      if (trimmed.contains('-')) {
+        final range = trimmed.split('-');
+        final start = int.tryParse(range[0].trim());
+        final end = int.tryParse(range[1].trim());
+        if (start != null && end != null && start >= 1 && end <= totalFilePages && start <= end) {
+          for (int i = start; i <= end; i++) {
+            pages.add(i);
+          }
+        }
+      } else {
+        final page = int.tryParse(trimmed);
+        if (page != null && page >= 1 && page <= totalFilePages) {
+          pages.add(page);
+        }
+      }
+    }
+    return pages.length;
+  }
+
   static double calculatePrice({
     required bool isColor,
     required int copies,
@@ -63,9 +100,9 @@ class Helpers {
     return pricePerPage * totalPages * copies;
   }
 
-  static int parseTotalPages(String pageOption, String? pageRange) {
-    if (pageOption == 'All') return 1;
-    if (pageRange == null || pageRange.isEmpty) return 1;
+  static int parseTotalPages(String pageOption, String? pageRange, int totalFilePages) {
+    if (pageOption == 'All') return totalFilePages;
+    if (pageRange == null || pageRange.isEmpty) return totalFilePages;
     final pages = <int>{};
     final parts = pageRange.split(',');
     for (final part in parts) {

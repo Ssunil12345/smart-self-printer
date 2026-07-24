@@ -15,6 +15,7 @@ class PrintProvider extends ChangeNotifier {
   String _pageOption = 'All';
   String? _pageRange;
   int _copies = 1;
+  int _totalFilePages = 0;
   bool _isUploading = false;
   double _uploadProgress = 0.0;
   String _uploadStatus = '';
@@ -26,6 +27,7 @@ class PrintProvider extends ChangeNotifier {
   String get pageOption => _pageOption;
   String? get pageRange => _pageRange;
   int get copies => _copies;
+  int get totalFilePages => _totalFilePages;
   bool get isUploading => _isUploading;
   double get uploadProgress => _uploadProgress;
   String get uploadStatus => _uploadStatus;
@@ -33,8 +35,13 @@ class PrintProvider extends ChangeNotifier {
   String? get error => _error;
   PrintOptionsModel? get currentOptions => _currentOptions;
 
+  Future<void> initFile(String filePath) async {
+    _totalFilePages = await Helpers.getPdfPageCount(filePath);
+    notifyListeners();
+  }
+
   double get calculatedPrice {
-    final totalPages = Helpers.parseTotalPages(_pageOption, _pageRange);
+    final totalPages = Helpers.parseTotalPages(_pageOption, _pageRange, _totalFilePages);
     return Helpers.calculatePrice(
       isColor: _isColor,
       copies: _copies,
@@ -43,7 +50,7 @@ class PrintProvider extends ChangeNotifier {
   }
 
   int get calculatedTotalPages {
-    return Helpers.parseTotalPages(_pageOption, _pageRange);
+    return Helpers.parseTotalPages(_pageOption, _pageRange, _totalFilePages);
   }
 
   void toggleColor() {
@@ -75,6 +82,7 @@ class PrintProvider extends ChangeNotifier {
     _pageOption = options.pageOption;
     _pageRange = options.pageRange;
     _copies = options.copies;
+    _totalFilePages = options.totalFilePages;
     notifyListeners();
   }
 
@@ -97,6 +105,7 @@ class PrintProvider extends ChangeNotifier {
         pageRange: _pageRange,
         copies: _copies,
         totalPages: calculatedTotalPages,
+        totalFilePages: _totalFilePages,
         totalPrice: calculatedPrice,
         fileName: fileName,
         filePath: filePath,
@@ -141,6 +150,7 @@ class PrintProvider extends ChangeNotifier {
     _pageOption = 'All';
     _pageRange = null;
     _copies = 1;
+    _totalFilePages = 0;
     _isUploading = false;
     _uploadProgress = 0.0;
     _uploadStatus = '';

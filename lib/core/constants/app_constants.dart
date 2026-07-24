@@ -17,14 +17,35 @@ class AppConstants {
   static const Duration retryDelay = Duration(seconds: 2);
 
   static const List<String> supportedExtensions = [
-    'pdf', 'doc', 'docx', 'ppt', 'pptx',
-    'xls', 'xlsx', 'jpg', 'jpeg', 'png',
-    'bmp', 'txt', 'webp', 'heic',
+    'pdf',
+    'doc',
+    'docx',
+    'ppt',
+    'pptx',
+    'xls',
+    'xlsx',
+    'jpg',
+    'jpeg',
+    'png',
+    'bmp',
+    'txt',
+    'webp',
+    'heic',
   ];
 
   static const List<String> imageExtensions = [
-    'jpg', 'jpeg', 'png', 'bmp', 'webp', 'heic',
+    'jpg',
+    'jpeg',
+    'png',
+    'bmp',
+    'webp',
+    'heic',
   ];
 
-  static const List<String> paymentMethodsList = ['UPI', 'Card', 'Wallet', 'Cash'];
+  static const List<String> paymentMethodsList = [
+    'UPI',
+    'Card',
+    'Wallet',
+    'Cash',
+  ];
 }

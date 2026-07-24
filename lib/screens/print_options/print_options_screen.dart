@@ -137,8 +137,7 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
                               helperMaxLines: 2,
                             ),
                             keyboardType: TextInputType.text,
-                            onChanged: (v) =>
-                                printProvider.setPageRange(v),
+                            onChanged: (v) => printProvider.setPageRange(v),
                           ),
                         ],
                       ],
@@ -160,7 +159,8 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
                             IconButton(
                               onPressed: printProvider.copies > 1
                                   ? () => printProvider.setCopies(
-                                      printProvider.copies - 1)
+                                      printProvider.copies - 1,
+                                    )
                                   : null,
                               icon: Container(
                                 padding: const EdgeInsets.all(8),
@@ -175,9 +175,13 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
                               ),
                             ),
                             Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 24),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 8),
+                                horizontal: 24,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: AppColors.border),
@@ -194,7 +198,8 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
                             IconButton(
                               onPressed: printProvider.copies < 100
                                   ? () => printProvider.setCopies(
-                                      printProvider.copies + 1)
+                                      printProvider.copies + 1,
+                                    )
                                   : null,
                               icon: Container(
                                 padding: const EdgeInsets.all(8),
@@ -221,7 +226,7 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
                     isColor: printProvider.isColor,
                     copies: printProvider.copies,
                     totalPages: printProvider.calculatedTotalPages,
-                    pricePerPage: printProvider.isColor ? 10 : 5,
+                    pricePerPage: printProvider.isColor ? 10 : 3,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -256,11 +261,7 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
       }
     }
 
-    Navigator.pushNamed(
-      context,
-      AppRoutes.loading,
-      arguments: file,
-    );
+    Navigator.pushNamed(context, AppRoutes.loading, arguments: file);
   }
 
   Widget _buildSectionTitle(String title) {
@@ -289,13 +290,11 @@ class _PrintOptionsScreenState extends State<PrintOptionsScreen> {
           color: isSelected
               ? AppColors.primary
               : Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withOpacity(0.05)
-                  : AppColors.primary.withOpacity(0.05),
+              ? Colors.white.withOpacity(0.05)
+              : AppColors.primary.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? AppColors.primary
-                : AppColors.border,
+            color: isSelected ? AppColors.primary : AppColors.border,
           ),
         ),
         child: Row(
